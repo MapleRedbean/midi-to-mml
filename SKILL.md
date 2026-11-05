@@ -41,7 +41,7 @@ python3 -m venv /vol1/@appdata/trim.hermes/venvs/midi2mml
 | 文件头 | `t{BPM}v{音量}o{起始八度}l16`（**默认无 MML@ 前缀**，需要时 `--prefix "MML@"`） |
 | 变速同步 | 曲子中途每次变速，**所有文件在同一音乐位置插入相同 `t{BPM}`**（跨音符时用延音拆开） |
 | 音量 | 由力度映射：`v = round(vel/127*15)`，默认取该声部**平均**力度 |
-| 鼓轨 | 通道 9 默认**跳过**，`--include-drums` 才转 |
+| 鼓轨 | 通道 9（GM 通道 10）**默认转换**，命名 `drums_10`，`--no-drums` 才跳过 |
 | 清单 | 输出目录生成 `manifest.json`（每文件的音符数、音量、BPM、量化栅格、告警） |
 
 ## 节奏基准：16 分音符（L16）
@@ -90,7 +90,7 @@ python3 -m venv /vol1/@appdata/trim.hermes/venvs/midi2mml
 --tie &                        延音符号（部分方言用 ^ 或 +）
 --max-volume 15                MML 音量上限（洛奇=15）
 --max-dots 1                   附点上限（0/1/2）
---include-drums                转换鼓轨（通道 9，默认跳过）
+--no-drums                     跳过鼓轨（GM 通道 10，默认转换）
 --prefer-flat                  升降号用 b-/e- 而非 c+/d+
 --flat                         不建音色文件夹，全部平铺
 --action auto|M0..M5|none      生成 _action.txt（默认 auto）

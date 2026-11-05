@@ -22,7 +22,7 @@ def nt(notes, vel=100, ch=0, name=None):
 nt([(0.0, 3.5, 60), (3.5, 0.5, 62), (4.0, 7.0, 64)], 100, name="longnotes")
 # 2) 三连音（在 --divisions 6 下应无误差）
 nt([(i*(1/3.0), 1/3.0, 60+i%3) for i in range(12)], 100, name="triplet")
-# 3) 鼓轨（通道 9，默认应被跳过）
+# 3) 鼓轨（通道 9，默认转换，--no-drums 才跳过）
 nt([(i*0.5, 0.25, 36 if i%2==0 else 38) for i in range(8)], 120, ch=9, name="drums")
 out = "/vol1/@appdata/trim.hermes/workspace/midi2mml/test_edge.mid"
 mid.save(out); print("saved", out)

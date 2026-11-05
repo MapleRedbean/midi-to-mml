@@ -179,7 +179,7 @@ class Track:
 
 
 # ---------------------------------------------------------------- 读取 MIDI
-def load_midi(path: str, include_drums: bool = False):
+def load_midi(path: str, include_drums: bool = True):
     mid = mido.MidiFile(path)
     tpb = mid.ticks_per_beat
     tempo_raw = []
@@ -484,7 +484,7 @@ def build_action_mml(tracks_notes, tempos, bpm0, default_len=16,
     return "".join(parts), act_cmd, npb
 
 def convert(midi_path, outdir, divisions="4", max_volume=15, default_len=16,
-            prefix="", tie="&", include_drums=False, prefer_flat=False,
+            prefix="", tie="&", include_drums=True, prefer_flat=False,
             max_dots=1, split_into_folders=True, zip_out=False, verbose=True,
             action="auto", action_min_rest=1.0):
     tpb, tempos, tracks, meta = load_midi(midi_path, include_drums=include_drums)
@@ -502,7 +502,10 @@ def convert(midi_path, outdir, divisions="4", max_volume=15, default_len=16,
     tracks_q = []
 
     for ti, tr in enumerate(tracks, 1):
-        slug, gid, en = gm_name(tr.program)
+        if tr.is_drum:
+            slug, gid, en = "drums", tr.channel + 1, "Drums"
+        else:
+            slug, gid, en = gm_name(tr.program)
         if divisions == "auto":
             div, err = pick_divisions(tr.notes)
         else:
@@ -624,7 +627,7 @@ def main(argv=None):
     ap.add_argument("--tie", default="&", help="延音符号（& 或 ^）")
     ap.add_argument("--max-volume", type=int, default=15)
     ap.add_argument("--max-dots", type=int, default=1)
-    ap.add_argument("--include-drums", action="store_true")
+    ap.add_argument("--no-drums", action="store_true", help="跳过鼓轨（GM 通道 10），默认转换鼓轨")
     ap.add_argument("--prefer-flat", action="store_true", help="用降号代替升号")
     ap.add_argument("--flat", action="store_true", help="不建音色文件夹，全部平铺")
     ap.add_argument("--action", default="auto", help="生成 _action.txt：auto|M0..M5|none（默认 auto 按复杂度选 M3/M4）")
@@ -635,7 +638,7 @@ def main(argv=None):
 
     res = convert(a.midi, a.out, divisions=a.divisions, max_volume=a.max_volume,
                   default_len=a.default_len, prefix=a.prefix, tie=a.tie,
-                  include_drums=a.include_drums, prefer_flat=a.prefer_flat,
+                  include_drums=not a.no_drums, prefer_flat=a.prefer_flat,
                   max_dots=a.max_dots, split_into_folders=not a.flat, zip_out=a.zip,
                   action=a.action, action_min_rest=a.action_min_rest)
     if a.json:
